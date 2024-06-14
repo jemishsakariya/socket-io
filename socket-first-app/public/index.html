@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat-app</title>
+  </head>
+  <body>
+    <input type="text" id="inpBtn" />
+    <button onclick="sendMessage()">Submit</button><br /><br />
+
+    <input type="text" id="roomChat" />
+    <button onclick="roomChatFun()">Send</button><br /><br />
+    <input type="text" id="roomInpBtn" />
+    <button onclick="joinRoom()">Join-Room</button>
+
+    <div id="messages"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      const inp = document.getElementById("inpBtn");
+      const messages = document.getElementById("messages");
+
+      function sendMessage() {
+        socket.emit("chat message", inp.value);
+      }
+
+      socket.on("chat message", (msg) => {
+        const item = document.createElement("li");
+        item.textContent = msg + " - normal emit";
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on("hi", (msg) => {
+        const item = document.createElement("li");
+        item.textContent = msg + " - broadcast";
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      const roomInpBtn = document.getElementById("roomInpBtn");
+      const roomChat = document.getElementById("roomChat");
+
+      function joinRoom() {
+        socket.emit("join-room", roomInpBtn.value);
+      }
+
+      function roomChatFun() {
+        socket.emit("onRoom", roomInpBtn.value, roomChat.value);
+      }
+
+      socket.on("foo", (roomChatMessage) => {
+        const item = document.createElement("li");
+        item.textContent = roomChatMessage + " - roomChat";
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      // let count = 0;
+      // setInterval(() => {
+      //   socket.volatile.emit("ping", ++count);
+      // }, 1000);
+    </script>
+  </body>
+</html>

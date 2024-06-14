@@ -1,0 +1,9 @@
+# Node.js / Express.js
+node_modules/
+package-lock.json
+
+# Environments
+.env
+
+# IDE / Editor
+.vscode/
