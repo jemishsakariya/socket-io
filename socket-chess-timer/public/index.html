@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Timer</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    #time {
+      display: flex;
+      gap: 10px;
+      font-size: 26px;
+    }
+
+    #main {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    #timeBtn {
+      height: 30px;
+      width: 60px;
+    }
+  </style>
+  <body>
+    <div id="main">
+      <div id="time">
+        <div id="clock">10:00</div>
+      </div>
+      <input id="timeBtn" type="button" value="W" />
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const clock = document.getElementById("clock");
+      const timeBtn = document.getElementById("timeBtn");
+
+      let minute = 9;
+      let second = 60;
+      let timerIntervalW;
+      let timerIntervalB;
+
+      timeBtn.addEventListener("click", () => {
+        if (timeBtn.value == "W") {
+          timeBtn.value = "B";
+          clearInterval(timerIntervalW);
+
+          socket.emit("startB");
+          socket.emit("stopW");
+        } else {
+          timeBtn.value = "W";
+          clearInterval(timerIntervalB);
+
+          socket.emit("startW");
+          socket.emit("stopB");
+        }
+      });
+
+      socket.on("startBlack", () => {
+        timeBtn.value = "B";
+
+        timerIntervalB = setInterval(() => {
+          second -= 1;
+          if (second == 0) {
+            minute -= 1;
+            second = 60;
+          } else if (minute == 0) {
+            clearInterval(timerIntervalB);
+          }
+          clock.innerText = minute + ":" + second;
+        }, 1000);
+      });
+
+      socket.on("startWhite", () => {
+        timeBtn.value = "W";
+
+        timerIntervalW = setInterval(() => {
+          second -= 1;
+          if (second == 0) {
+            minute -= 1;
+            second = 60;
+          } else if (minute == 0) {
+            clearInterval(timerIntervalW);
+          }
+          clock.innerText = minute + ":" + second;
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
