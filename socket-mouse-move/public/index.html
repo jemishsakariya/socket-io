@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mouse Move</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    #circle {
+      height: 16px;
+      width: 16px;
+      border-radius: 24px;
+      background-color: #000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: -99999999;
+      /* so that it stays on top of all other elements */
+    }
+  </style>
+  <body id="body" onmousemove="coordinate(event)">
+    <div id="circle"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const circles = document.getElementById("circle");
+
+      function coordinate(event) {
+        let x = event.clientX;
+        let y = event.clientY;
+
+        circles.style.left = x + "px";
+        circles.style.top = y + "px";
+
+        socket.emit("cordinate", { x, y });
+      }
+
+      socket.on("sendCordinateToEveryOne", ({ x, y }) => {
+        circles.style.left = x + "px";
+        circles.style.top = y + "px";
+
+        // console.log(x, y);
+      });
+    </script>
+  </body>
+</html>
